@@ -1,5 +1,5 @@
 var express = require("express");
-// var db = require('./db'); // will need to be 
+var db = require('./express-server/db/sequelize-init.js');
 // Middleware
 let cors = require("cors");
 var morgan = require("morgan");
@@ -13,6 +13,7 @@ app.set("port", 3000);
 // Logging and parsing
 app.use(cors());
 app.use(morgan("dev"));
+app.use(parser.urlencoded({extended:true}));
 app.use(parser.json());
 // Set up our routes
 app.use("/qa", router);
