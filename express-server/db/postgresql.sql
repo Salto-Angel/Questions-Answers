@@ -16,7 +16,9 @@ CREATE TABLE questions (
   helpful INTEGER NOT NULL DEFAULT 0,
   PRIMARY KEY (question_id)
 );
+CREATE INDEX question_index ON questions(product_id);
 
+SELECT setval('questions_question_id_seq', (SELECT MAX(question_id) from "questions"));
 -- ---
 -- Table 'answers'
 -- list for the answers, each answer will have a foreign key linked to some question in the question list
@@ -35,7 +37,10 @@ CREATE TABLE answers (
   helpfulness INTEGER NOT NULL DEFAULT 0,
   PRIMARY KEY (answer_id)
 );
+ALTER TABLE answers ADD CONSTRAINT answers_foreign FOREIGN KEY (question_id) REFERENCES questions(question_id);
+CREATE INDEX answers_index ON answers(question_id);
 
+SELECT setval('answers_answer_id_seq', (SELECT MAX(answer_id) from "answers"));
 -- ---
 -- Table 'photos'
 -- photos list, will have a key linked to which answer it is associated with
@@ -49,3 +54,8 @@ CREATE TABLE photos (
   url TEXT NULL DEFAULT NULL,
   PRIMARY KEY (id)
 );
+ALTER TABLE photos ADD CONSTRAINT photos_foreign FOREIGN KEY (answer_id) REFERENCES answers(answer_id);
+CREATE INDEX photos_index ON photos(answer_id);
+
+SELECT setval('photos_id_seq', (SELECT MAX(id) from "photos"));
+

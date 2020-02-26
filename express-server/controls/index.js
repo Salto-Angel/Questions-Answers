@@ -26,16 +26,17 @@ module.exports = {
   question_id: {
     get: async (req, res) => {
       const questionId = req.params.question_id;
-      const page = req.query.page;
-      const count = req.query.count;
+      const page = req.query.page || 1;
+      const count = req.query.count || 5;
       let result = await models.question_id.get(questionId, page, count);
       let returnThis = {
         question: questionId,
         page: page,
         count: count,
-        results: []
+        results: result
       };
-      res.send(result);
+      console.log(returnThis);
+      res.send(returnThis);
     },
     post: async (req, res) => {
       const questionId = req.params.question_id;
@@ -85,6 +86,24 @@ module.exports = {
       } else {
         res.sendStatus(500);
       }
+    }
+  },
+  test: async (req,res) =>{
+    const id = req.params.id;
+    let result = await models.test(id);
+    if(result){
+        res.send(result);
+    }else{
+        res.sendStatus(500);
+    }
+  },
+  photos: async (req,res) =>{
+    const id = req.params.id;
+    let result = await models.photos(id);
+    if(result){
+        res.send(result);
+    }else{
+        res.sendStatus(500);
     }
   }
 };
