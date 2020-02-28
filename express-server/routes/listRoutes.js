@@ -7,8 +7,5 @@ router.post("/:question_id/answers", controls.question_id.post);
 router.get("/:product_id", controls.product_id.get);
 router.post("/:product_id", controls.product_id.post);
 
-router.get("/:id/test", controls.test);
-router.get("/:id/photos", controls.photos);
-
 module.exports = router;
 

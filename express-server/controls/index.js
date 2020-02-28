@@ -9,9 +9,9 @@ module.exports = {
       let result = await models.product_id.get(productId, page, count);
       let returnThis = {
         product_id: productId,
-        results: []
+        results: result
       };
-      res.send(result);
+      res.send(returnThis);
     },
     post: async (req, res) => {
       const productId = req.params.product_id;
@@ -35,7 +35,6 @@ module.exports = {
         count: count,
         results: result
       };
-      console.log(returnThis);
       res.send(returnThis);
     },
     post: async (req, res) => {
@@ -86,24 +85,6 @@ module.exports = {
       } else {
         res.sendStatus(500);
       }
-    }
-  },
-  test: async (req,res) =>{
-    const id = req.params.id;
-    let result = await models.test(id);
-    if(result){
-        res.send(result);
-    }else{
-        res.sendStatus(500);
-    }
-  },
-  photos: async (req,res) =>{
-    const id = req.params.id;
-    let result = await models.photos(id);
-    if(result){
-        res.send(result);
-    }else{
-        res.sendStatus(500);
     }
   }
 };
