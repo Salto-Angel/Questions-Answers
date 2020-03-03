@@ -1,7 +1,8 @@
 /node_modules
 /csv
-/db
 .package-lock.json
 .env
 .Dockerfile
 .docker-compose.yml
+.dockerignore
+

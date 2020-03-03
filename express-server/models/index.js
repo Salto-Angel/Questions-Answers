@@ -2,7 +2,7 @@ const { client: db } = require("../db/sequelize-init");
 
 module.exports = {
   product_id: {
-    get: async (productId, page = 1, count = 5) => {
+    get:  (productId, page, count) => {
       let query = `
     SELECT question_id,question_body,question_date,asker_name,helpful as question_helpfulness, reported,
       (
@@ -25,9 +25,14 @@ module.exports = {
     WHERE product_id = ${productId} AND 
     reported = 0 LIMIT ${count} OFFSET ${(page - 1) * count}
     `;
-      let resultArr = await db.query(query);
-
-      return resultArr.rows;
+      const cl = db.query(query)
+      .then((res)=>{
+        return res.rows;
+      })
+      .catch((err)=>{
+        console.log(err)
+      })
+      return cl
     },
     post: async (productId, reqBody) => {
       const body = reqBody.body;
@@ -66,8 +71,14 @@ module.exports = {
       WHERE question_id = ${questionId} AND reported = 0 LIMIT ${count} OFFSET ${(page -
         1) *
         count}`;
-      let resultArr = await db.query(query);
-      return resultArr.rows;
+        const cl = db.query(query)
+        .then((res)=>{
+          return res.rows;
+        })
+        .catch((err)=>{
+          console.log(err)
+        })
+        return cl
     },
     post: async (questionId, reqBody) => {
       const body = reqBody.body;
@@ -115,7 +126,6 @@ module.exports = {
     report: async (answerId) => {
       let query = `UPDATE answers SET reported = 1 WHERE answer_id = ${answerId}`;
       let result = await db.query(query);
-
       return result;
     }
   }

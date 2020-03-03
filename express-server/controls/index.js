@@ -1,17 +1,26 @@
 const models = require("../models");
+const client = require("../../cache/index.js");
 
 module.exports = {
   product_id: {
     get: async (req, res) => {
       const productId = req.params.product_id;
-      const page = req.query.page;
-      const count = req.query.count;
-      let result = await models.product_id.get(productId, page, count);
-      let returnThis = {
-        product_id: productId,
-        results: result
-      };
-      res.send(returnThis);
+      const page = req.query.page || 1;
+      const count = req.query.count || 5;
+      const memcache = `product_id_get_${productId}_${page}_${count}`;
+      client.getAsync(memcache).then(async (cache) => {
+        if (!cache) {
+          let result = await models.product_id.get(productId, page, count);
+          let returnThis = {
+            product_id: productId,
+            results: result
+          };
+          client.setAsync(memcache, JSON.stringify(returnThis));
+          res.send(returnThis);
+        } else {
+          res.send(JSON.parse(cache));
+        }
+      });
     },
     post: async (req, res) => {
       const productId = req.params.product_id;
@@ -28,14 +37,22 @@ module.exports = {
       const questionId = req.params.question_id;
       const page = req.query.page || 1;
       const count = req.query.count || 5;
-      let result = await models.question_id.get(questionId, page, count);
-      let returnThis = {
-        question: questionId,
-        page: page,
-        count: count,
-        results: result
-      };
-      res.send(returnThis);
+      const memcache = `product_id_get_${questionId}_${page}_${count}`;
+      client.getAsync(memcache).then(async (cache) => {
+        if (!cache) {
+          let result = await models.question_id.get(questionId, page, count);
+          let returnThis = {
+            question: questionId,
+            page: page,
+            count: count,
+            results: result
+          };
+          client.setAsync(memcache, JSON.stringify(returnThis));
+          res.send(returnThis);
+        } else {
+          res.send(JSON.parse(cache));
+        }
+      });
     },
     post: async (req, res) => {
       const questionId = req.params.question_id;
