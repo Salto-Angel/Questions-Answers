@@ -2,7 +2,3 @@
 /csv
 .package-lock.json
 .env
-.Dockerfile
-.docker-compose.yml
-.dockerignore
-
