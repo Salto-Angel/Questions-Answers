@@ -1,9 +1,8 @@
-const Sequelize = require("sequelize");
-const { sequelize: db } = require("../db/sequelize-init");
+const { client: db } = require("../db/sequelize-init");
 
 module.exports = {
   product_id: {
-    get: async (productId, page = 1, count = 5) => {
+    get:  (productId, page, count) => {
       let query = `
     SELECT question_id,question_body,question_date,asker_name,helpful as question_helpfulness, reported,
       (
@@ -26,10 +25,14 @@ module.exports = {
     WHERE product_id = ${productId} AND 
     reported = 0 LIMIT ${count} OFFSET ${(page - 1) * count}
     `;
-      let resultArr = await db.query(query).then(async ([result, metadata]) => {
-        return result;
-      });
-      return resultArr;
+      const cl = db.query(query)
+      .then((res)=>{
+        return res.rows;
+      })
+      .catch((err)=>{
+        console.log(err)
+      })
+      return cl
     },
     post: async (productId, reqBody) => {
       const body = reqBody.body;
@@ -47,15 +50,8 @@ module.exports = {
       }
       const date = `${yyyy}-${mm}-${dd}`;
       const query = `INSERT INTO questions (product_id,question_body,question_date,asker_name,asker_email,reported,helpful) VALUES('${productId}','${body}','${date}','${name}','${email}',0,0)`;
-      let result = await db
-        .query(query)
-        .then(() => {
-          return true;
-        })
-        .catch((err) => {
-          console.log(err);
-          return false;
-        });
+      let result = await db.query(query);
+
       return result;
     }
   },
@@ -75,10 +71,14 @@ module.exports = {
       WHERE question_id = ${questionId} AND reported = 0 LIMIT ${count} OFFSET ${(page -
         1) *
         count}`;
-      let resultArr = await db.query(query).then(async ([result, metadata]) => {
-        return result;
-      });
-      return resultArr;
+        const cl = db.query(query)
+        .then((res)=>{
+          return res.rows;
+        })
+        .catch((err)=>{
+          console.log(err)
+        })
+        return cl
     },
     post: async (questionId, reqBody) => {
       const body = reqBody.body;
@@ -97,114 +97,36 @@ module.exports = {
       }
       const date = `${yyyy}-${mm}-${dd}`;
       const query = `INSERT INTO answers (question_id,body,answer_date,answerer_name,answerer_email,reported,helpfulness) VALUES('${questionId}','${body}','${date}','${name}','${email}',0,0)`;
-      let result = await db
-        .query(query)
-        .then(() => {
-          return true;
-        })
-        .catch((err) => {
-          console.log(err);
-          return false;
-        });
+      let result = await db.query(query);
+
       return result;
     }
   },
   questions: {
     helpful: async (questionId) => {
       let query = `UPDATE questions SET helpful = helpful + 1 WHERE question_id = ${questionId}`;
-      let result = await db
-        .query(query)
-        .then(([result, metadata]) => {
-          return true;
-        })
-        .catch((err) => {
-          return false;
-        });
+      let result = await db.query(query);
+
       return result;
     },
     report: async (questionId) => {
       let query = `UPDATE questions SET reported = 1 WHERE question_id = ${questionId}`;
-      let result = await db
-        .query(query)
-        .then(([result, metadata]) => {
-          return true;
-        })
-        .catch((err) => {
-          return false;
-        });
+      let result = await db.query(query);
+
       return result;
     }
   },
   answers: {
     helpful: async (answerId) => {
       let query = `UPDATE answers SET helpfulness = helpfulness + 1 WHERE answer_id = ${answerId}`;
-      let result = await db
-        .query(query)
-        .then(([result, metadata]) => {
-          return true;
-        })
-        .catch((err) => {
-          return false;
-        });
+      let result = await db.query(query);
+
       return result;
     },
     report: async (answerId) => {
       let query = `UPDATE answers SET reported = 1 WHERE answer_id = ${answerId}`;
-      let result = await db
-        .query(query)
-        .then(([result, metadata]) => {
-          return true;
-        })
-        .catch((err) => {
-          return false;
-        });
+      let result = await db.query(query);
       return result;
     }
-  },
-  test: async (id) => {
-    let query = `
-    SELECT question_id,question_body,question_date,asker_name,helpful as question_helpfulness, reported,
-      (
-        SELECT array_to_json(coalesce(array_agg(row_to_json(b)),'{}'))
-          FROM (
-            SELECT answer_id, body, answer_date as date, answerer_name, helpfulness,
-              (
-                SELECT array_to_json(coalesce(array_agg(row_to_json(d)),'{}'))
-                FROM (
-                  SELECT id, url
-                  FROM photos
-                  WHERE answer_id=answers.answer_id
-                ) d
-              ) AS photos
-            FROM answers
-          WHERE question_id=questions.question_id AND reported = 0
-        ) b
-      ) AS answers
-      FROM questions
-    WHERE product_id = ${id} AND reported = 0
-    `;
-    let result = await db
-      .query(query)
-      .then(([result, meta]) => {
-        return result;
-      })
-      .catch((err) => {
-        console.log(err);
-        return false;
-      });
-    return result;
-  },
-  photos: async (id) => {
-    let query = `select * from photos where answer_id = ${id}`;
-    let result = await db
-      .query(query)
-      .then(([result, meta]) => {
-        return result;
-      })
-      .catch((err) => {
-        console.log(err);
-        return false;
-      });
-    return result;
   }
 };

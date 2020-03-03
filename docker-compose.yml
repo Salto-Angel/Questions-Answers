@@ -1,0 +1,16 @@
+version: "3.7"
+
+services:
+  db:
+    image: redis
+    container_name: redis_container
+  server:
+    image: tg1009/sdc:1.10
+    container_name: server_container
+    
+    env_file: 
+      - .env
+    ports:
+      - 80:3000
+    depends_on: 
+      - db
